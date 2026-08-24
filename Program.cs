@@ -21,12 +21,9 @@ using (var scope = app.Services.CreateScope())
     DbInitializer.Initialize(context);
 }
 
-app.UseHttpsRedirection();
-
-// Permite ler arquivos estáticos da pasta wwwroot (como o index.html e as imagens)
-app.UseStaticFiles();
-
 app.UseAuthorization();
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 app.MapControllers();
 
