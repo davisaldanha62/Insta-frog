@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INSTAFROG 🐸</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #f0f7f4;
+            color: #2f3e46;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            color: #354f52;
+            font-size: 2.3rem;
+            margin-bottom: 5px;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background-color: #cad2c5;
+            color: #2f3e46;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .nav-btn.active, .nav-btn:hover {
+            background-color: #52796f;
+            color: white;
+        }
+
+        .secao {
+            display: none;
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .secao.active {
+            display: block;
+        }
+
+        .perfil-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .perfil-form input, .perfil-form textarea {
+            padding: 12px;
+            border: 2px solid #cad2c5;
+            border-radius: 10px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .perfil-form input:focus, .perfil-form textarea:focus {
+            border-color: #52796f;
+        }
+
+        .btn-salvar {
+            padding: 12px;
+            background-color: #52796f;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-salvar:hover {
+            background-color: #354f52;
+        }
+
+        .perfil-card {
+            text-align: center;
+        }
+
+        .perfil-card img {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #52796f;
+            margin-bottom: 15px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"] {
+            padding: 10px 20px;
+            width: 280px;
+            border: 2px solid #cad2c5;
+            border-radius: 25px;
+            outline: none;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .card-content h3 {
+            font-size: 1.2rem;
+            color: #2f3e46;
+            margin-bottom: 5px;
+        }
+
+        .card-content p {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+
+        .card-footer {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+
+        .tag {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .btn-fav {
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🐸INSTAFROGS</h1>
+    </header>
+
+    <nav id="menuNavegacao" style="display: none;">
+        <button class="nav-btn active" onclick="mudarAba('catalogo')">Catálogo de Sapos</button>
+        <button class="nav-btn" onclick="mudarAba('perfil')">Meu Perfil & Favoritos</button>
+    </nav>
+
+    <div id="secaoCadastro" class="secao active">
+        <h2 style="margin-bottom: 20px; color: #354f52; text-align: center;" id="tituloCadastro">Crie o seu Perfil</h2>
+        <form class="perfil-form" id="formPerfil" onsubmit="salvarPerfil(event)">
+            <label><strong>Seu Nome:</strong></label>
+            <input type="text" id="inputNome" required placeholder="Ex: Lara Ellys">
+            
+            <label><strong>Sua Bio / Descrição:</strong></label>
+            <textarea id="inputBio" rows="3" placeholder="Conte um pouco sobre seu amor por anfíbios..."></textarea>
+            
+            <label><strong>Sua Foto de Perfil:</strong></label>
+            <input type="file" id="inputFoto" accept="image/*">
+            
+            <button type="submit" class="btn-salvar">Salvar e Entrar no Catálogo</button>
+        </form>
+    </div>
+
+    <div id="secaoCatalogo" class="secao" style="max-width: 1200px; background: transparent; box-shadow: none; padding: 0;">
+        <div class="controls">
+            <input type="text" id="searchInput" placeholder="Pesquisar sapo por nome ou habitat..." onkeyup="filtrarSapos()">
+        </div>
+        <div class="grid-container" id="sapoGrid"></div>
+    </div>
+
+    <div id="secaoPerfil" class="secao">
+        <div class="perfil-card">
+            <img id="perfilFoto" src="" alt="Foto de Perfil">
+            <h2 id="perfilNome" style="color: #354f52; margin-bottom: 5px;"></h2>
+            <p id="perfilBio" style="color: #6c757d; margin-bottom: 20px;"></p>
+            <button class="nav-btn" onclick="abrirEdicaoPerfil()" style="margin-bottom: 30px;">Editar Perfil</button>
+        </div>
+
+        <h3 style="color: #354f52; margin-bottom: 15px; border-bottom: 2px solid #cad2c5; padding-bottom: 5px;">❤️ Meus Sapos Favoritos</h3>
+        <div class="grid-container" id="favoritosGrid" style="grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));">
+        </div>
+    </div>
+
+    <script>
+        let todosSapos = [];
+        let perfilUsuario = null;
+
+        async function verificarPerfilInicial() {
+            try {
+                const res = await fetch('/api/perfil');
+                if (res.ok) {
+                    perfilUsuario = await res.json();
+                    document.getElementById('secaoCadastro').classList.remove('active');
+                    document.getElementById('menuNavegacao').style.display = 'flex';
+                    mudarAba('catalogo');
+                    carregarSapos();
+                    carregarPerfilNaTela();
+                } else {
+                    document.getElementById('secaoCadastro').classList.add('active');
+                }
+            } catch (e) {
+                console.log("Nenhum perfil encontrado ainda.");
+            }
+        }
+
+        async function salvarPerfil(event) {
+            event.preventDefault();
+            const formData = new FormData();
+            formData.append('nome', document.getElementById('inputNome').value);
+            formData.append('bio', document.getElementById('inputBio').value);
+            
+            const fotoInput = document.getElementById('inputFoto').files[0];
+            if (fotoInput) {
+                formData.append('foto', fotoInput);
+            }
+
+            const res = await fetch('/api/perfil', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (res.ok) {
+                perfilUsuario = await res.json();
+                document.getElementById('menuNavegacao').style.display = 'flex';
+                carregarPerfilNaTela();
+                carregarSapos();
+                mudarAba('catalogo');
+            }
+        }
+
+        function carregarPerfilNaTela() {
+            if (!perfilUsuario) return;
+            document.getElementById('perfilNome').innerText = perfilUsuario.nome;
+            document.getElementById('perfilBio').innerText = perfilUsuario.bio || "Sem biografia cadastrada.";
+            document.getElementById('perfilFoto').src = perfilUsuario.urlFotoPerfil || 'https://via.placeholder.com/130';
+        }
+
+        function abrirEdicaoPerfil() {
+            document.getElementById('inputNome').value = perfilUsuario.nome;
+            document.getElementById('inputBio').value = perfilUsuario.bio;
+            document.getElementById('tituloCadastro').innerText = "Atualizar seu Perfil";
+            
+            document.querySelectorAll('.secao').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('secaoCadastro').classList.add('active');
+        }
+
+        function mudarAba(nomeAba) {
+            document.querySelectorAll('.secao').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+            if (nomeAba === 'catalogo') {
+                document.getElementById('secaoCatalogo').classList.add('active');
+                event?.target?.classList.add('active');
+            } else if (nomeAba === 'perfil') {
+                document.getElementById('secaoPerfil').classList.add('active');
+                carregarFavoritosNaAba();
+            }
+        }
+
+        async function carregarSapos() {
+            try {
+                const response = await fetch('/api/sapos');
+                todosSapos = await response.json();
+                exibirSapos(todosSapos, 'sapoGrid');
+            } catch (error) {
+                console.error("Erro ao carregar sapos:", error);
+            }
+        }
+
+        function exibirSapos(lista, elementId) {
+            const grid = document.getElementById(elementId);
+            grid.innerHTML = '';
+
+            if (lista.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; grid-column: 1/-1; color: #6c757d;">Nenhum sapo encontrado.</p>';
+                return;
+            }
+
+            lista.forEach(sapo => {
+                const coracao = sapo.favorito ? '❤️' : '🤍';
+                
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <img src="${sapo.urlImagem}" alt="${sapo.nome}">
+                    <div class="card-content">
+                        <h3>${sapo.nome}</h3>
+                        <p><strong>Habitat:</strong> ${sapo.habitat}</p>
+                        <div class="card-footer">
+                            <span class="tag">${sapo.tipo}</span>
+                            <button class="btn-fav" onclick="toggleFavorito(${sapo.id})">${coracao}</button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filtrarSapos() {
+            const termo = document.getElementById('searchInput').value.toLowerCase();
+            const filtrados = todosSapos.filter(sapo => 
+                sapo.nome.toLowerCase().includes(termo) || 
+                sapo.habitat.toLowerCase().includes(termo)
+            );
+            exibirSapos(filtrados, 'sapoGrid');
+        }
+
+        async function toggleFavorito(id) {
+            const sapo = todosSapos.find(s => s.id === id);
+            if (!sapo) return;
+
+            sapo.favorito = !sapo.favorito;
+
+            try {
+                await fetch(`/api/sapos/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(sapo)
+                });
+                exibirSapos(todosSapos, 'sapoGrid');
+                carregarFavoritosNaAba();
+            } catch (error) {
+                console.error("Erro ao atualizar favorito:", error);
+            }
+        }
+
+        function carregarFavoritosNaAba() {
+            const favoritos = todosSapos.filter(sapo => sapo.favorito);
+            exibirSapos(favoritos, 'favoritosGrid');
+        }
+
+        verificarPerfilInicial();
+    </script>
+</body>
+</html>
