@@ -250,46 +250,48 @@
         let perfilUsuario = null;
 
         async function verificarPerfilInicial() {
-            try {
-                const res = await fetch('/api/perfil');
-                if (res.ok) {
-                    perfilUsuario = await res.json();
-                    document.getElementById('secaoCadastro').classList.remove('active');
-                    document.getElementById('menuNavegacao').style.display = 'flex';
-                    mudarAba('catalogo');
-                    carregarSapos();
-                    carregarPerfilNaTela();
-                } else {
-                    document.getElementById('secaoCadastro').classList.add('active');
-                }
-            } catch (e) {
-                console.log("Nenhum perfil encontrado ainda.");
+            // Verifica se já existe um perfil salvo na sessão desta aba
+            const perfilSalvo = sessionStorage.getItem('perfil_usuario');
+            if (perfilSalvo) {
+                perfilUsuario = JSON.parse(perfilSalvo);
+                document.getElementById('secaoCadastro').classList.remove('active');
+                document.getElementById('menuNavegacao').style.display = 'flex';
+                mudarAba('catalogo');
+                carregarSapos();
+                carregarPerfilNaTela();
+            } else {
+                document.getElementById('secaoCadastro').classList.add('active');
             }
         }
 
-        async function salvarPerfil(event) {
+        function salvarPerfil(event) {
             event.preventDefault();
-            const formData = new FormData();
-            formData.append('nome', document.getElementById('inputNome').value);
-            formData.append('bio', document.getElementById('inputBio').value);
             
+            const nome = document.getElementById('inputNome').value;
+            const bio = document.getElementById('inputBio').value;
             const fotoInput = document.getElementById('inputFoto').files[0];
+
             if (fotoInput) {
-                formData.append('foto', fotoInput);
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    perfilUsuario = { nome, bio, urlFotoPerfil: e.target.result };
+                    sessionStorage.setItem('perfil_usuario', JSON.stringify(perfilUsuario));
+                    finalizarLoginPerfil();
+                };
+                reader.readAsDataURL(fotoInput);
+            } else {
+                perfilUsuario = { nome, bio, urlFotoPerfil: 'https://via.placeholder.com/130' };
+                sessionStorage.setItem('perfil_usuario', JSON.stringify(perfilUsuario));
+                finalizarLoginPerfil();
             }
+        }
 
-            const res = await fetch('/api/perfil', {
-                method: 'POST',
-                body: formData
-            });
-
-            if (res.ok) {
-                perfilUsuario = await res.json();
-                document.getElementById('menuNavegacao').style.display = 'flex';
-                carregarPerfilNaTela();
-                carregarSapos();
-                mudarAba('catalogo');
-            }
+        function finalizarLoginPerfil() {
+            document.getElementById('secaoCadastro').classList.remove('active');
+            document.getElementById('menuNavegacao').style.display = 'flex';
+            carregarPerfilNaTela();
+            carregarSapos();
+            mudarAba('catalogo');
         }
 
         function carregarPerfilNaTela() {
@@ -325,7 +327,17 @@
         async function carregarSapos() {
             try {
                 const response = await fetch('/api/sapos');
-                todosSapos = await response.json();
+                const saposApi = await response.json();
+                
+                // Pega os favoritos salvos nesta sessão do navegador
+                const favoritosSalvos = JSON.parse(sessionStorage.getItem('favoritos_sessao')) || [];
+
+                // Aplica o estado de favorito de acordo com a sessão atual
+                todosSapos = saposApi.map(sapo => ({
+                    ...sapo,
+                    favorito: favoritosSalvos.includes(sapo.id)
+                }));
+
                 exibirSapos(todosSapos, 'sapoGrid');
             } catch (error) {
                 console.error("Erro ao carregar sapos:", error);
@@ -370,23 +382,18 @@
             exibirSapos(filtrados, 'sapoGrid');
         }
 
-        async function toggleFavorito(id) {
+        function toggleFavorito(id) {
             const sapo = todosSapos.find(s => s.id === id);
             if (!sapo) return;
 
             sapo.favorito = !sapo.favorito;
 
-            try {
-                await fetch(`/api/sapos/${id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(sapo)
-                });
-                exibirSapos(todosSapos, 'sapoGrid');
-                carregarFavoritosNaAba();
-            } catch (error) {
-                console.error("Erro ao atualizar favorito:", error);
-            }
+            // Salva a lista atualizada de favoritos na sessão da aba
+            let favoritosSalvos = todosSapos.filter(s => s.favorito).map(s => s.id);
+            sessionStorage.setItem('favoritos_sessao', JSON.stringify(favoritosSalvos));
+
+            exibirSapos(todosSapos, 'sapoGrid');
+            carregarFavoritosNaAba();
         }
 
         function carregarFavoritosNaAba() {
